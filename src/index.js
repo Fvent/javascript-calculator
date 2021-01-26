@@ -24,7 +24,8 @@ class Calculator extends React.Component {
             firstClick: true,
             allowDecimal: true,
             allowOperator: false,
-            firstDigit: true
+            firstDigit: true,
+            allowEquals:false
         }
         
         this.handleClearClick = this.handleClearClick.bind(this);
@@ -41,7 +42,8 @@ class Calculator extends React.Component {
             firstClick: true,
             allowDecimal: true,
             allowOperator: false,
-            firstDigit: true
+            firstDigit: true,
+            allowEquals:false
         });
     }
     handleButtonClick(event){
@@ -50,13 +52,15 @@ class Calculator extends React.Component {
                 displayed: event.target.innerText,
                 firstClick: false,
                 allowOperator: true,
-                firstDigit: false
+                firstDigit: false,
+                allowEquals: true
             })
         }else{
             this.setState({
                 displayed: this.state.displayed.concat(event.target.innerText),
                 allowOperator: true,
-                firstDigit: false
+                firstDigit: false,
+                allowEquals: true
             })
         }   
     }
@@ -76,14 +80,50 @@ class Calculator extends React.Component {
                 displayed: this.state.displayed.concat(event.target.innerText),
                 allowDecimal: true,
                 firstClick: false,
-                firstDigit: true
+                firstDigit: true,
+                allowEquals: false
             });
         }
     }
     handleEqualsClick(){
-        var formulaString = this.state.displayed;
-        var formulaNumbers = formulaString.split('+').join(' ').split('-').join(' ').split('x').join(' ').split('/').join(' ').split(' ');
-        console.log(formulaNumbers);
+        if(this.state.allowEquals){
+            var formulaString = this.state.displayed;
+        
+            var formulaArray = formulaString.split('');
+
+            var arrayWithTwo = [];
+            
+            for(let i = 0; i < formulaArray.length; i++){
+                
+                if(this.isOperator(formulaArray[i]) && this.isOperator(formulaArray[i+1]) && this.isOperator(formulaArray[i+2]) ){
+
+                }else{
+                    arrayWithTwo.push(formulaArray[i])
+                }
+            }
+
+           
+            for(let i = 0; i < arrayWithTwo.length; i++){
+                if(this.isOperator(arrayWithTwo[i]) && this.isOperator(arrayWithTwo[i+1])){
+
+                    if(arrayWithTwo[i+1] === '-'){
+                        
+                    }else{
+                        arrayWithTwo.splice(i,1);
+                    }
+                }
+            }
+            
+            var refinedFormula = arrayWithTwo.join('').replaceAll('x','*').replaceAll('--','+');
+            
+            
+            this.setState({
+                displayed: eval(refinedFormula).toString() ,
+                allowOperator:true,
+                allowDecimal:true
+            });
+        }
+        
     }
     handleZeroClick(event){
         if(!this.state.firstDigit){
@@ -91,6 +131,9 @@ class Calculator extends React.Component {
         }
     }
 
+    isOperator = (c) => {
+        return c === '+' || c === '-' || c === 'x' || c === '/';
+    }
 
     render(){
         return (<div id="calculator">
